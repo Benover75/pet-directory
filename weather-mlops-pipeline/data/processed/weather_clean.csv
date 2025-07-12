@@ -1,0 +1,5 @@
+timestamp,city,temperature_celsius,temperature_fahrenheit,feels_like_celsius,feels_like_fahrenheit,temp_min_celsius,temp_min_fahrenheit,temp_max_celsius,temp_max_fahrenheit,humidity,pressure_hpa,pressure_inhg,wind_speed_ms,wind_speed_mph,wind_speed_kmh,wind_direction,visibility_m,visibility_km,visibility_mi,weather_description,weather_main,weather_icon,sunrise_time,sunset_time,cloud_coverage,wind_speed,hour
+2025-07-11 23:54:40.283241,Cranston,,,,,,,,,88,1017,,4.63,,,160,10000,,,,,,,,75,,23
+2025-07-12 00:03:32.036139,Cranston,21.99,71.582,22.59,72.662,20.91,69.638,23.22,73.79599999999999,90,1017,30.03201,4.12,9.21644,14.832,210,10000,10.0,6.21371,clear sky,Clear,01d,05:21:09,20:21:13,0,,0
+2025-07-12 00:06:08.121146,Cranston,21.95,71.50999999999999,22.55,72.59,20.91,69.638,23.43,74.174,90,1017,30.03201,4.12,9.21644,14.832,160,10000,10.0,6.21371,clear sky,Clear,01d,05:21:09,20:21:13,0,,0
+2025-07-12 00:57:16.668710,Cranston,21.16,70.088,21.73,71.114,19.93,67.874,22.41,72.338,92,1018,30.06154,4.12,9.21644,14.832,160,10000,10.0,6.21371,clear sky,Clear,01n,05:21:09,20:21:13,0,,0

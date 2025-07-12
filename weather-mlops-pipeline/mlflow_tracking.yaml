@@ -1,0 +1,3 @@
+# mlflow_tracking.yaml
+tracking_uri: http://localhost:5000
+experiment_name: Weather Forecast
