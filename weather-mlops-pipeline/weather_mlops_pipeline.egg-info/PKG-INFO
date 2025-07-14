@@ -1,3 +1,63 @@
+Metadata-Version: 2.4
+Name: weather-mlops-pipeline
+Version: 2.0.0
+Summary: A comprehensive MLOps pipeline for weather data collection, preprocessing, and machine learning model training
+Author-email: Weather MLOps Team <team@weather-mlops.com>
+License: MIT
+Project-URL: Homepage, https://github.com/weather-mlops/pipeline
+Project-URL: Documentation, https://weather-mlops.readthedocs.io
+Project-URL: Repository, https://github.com/weather-mlops/pipeline.git
+Project-URL: Bug Tracker, https://github.com/weather-mlops/pipeline/issues
+Keywords: mlops,weather,machine-learning,data-pipeline,kubeflow
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: scikit-learn>=1.3.0
+Requires-Dist: matplotlib>=3.7.0
+Requires-Dist: seaborn>=0.12.0
+Requires-Dist: plotly>=5.15.0
+Requires-Dist: fastapi>=0.100.0
+Requires-Dist: uvicorn[standard]>=0.23.0
+Requires-Dist: requests>=2.31.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: click>=8.1.0
+Requires-Dist: joblib>=1.3.0
+Requires-Dist: mlflow>=2.5.0
+Requires-Dist: wandb>=0.15.0
+Requires-Dist: kfp>=2.13.0
+Requires-Dist: kubernetes>=28.0.0
+Requires-Dist: optuna>=3.2.0
+Requires-Dist: shap>=0.42.0
+Requires-Dist: xgboost>=1.7.0
+Requires-Dist: lightgbm>=4.0.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.1.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: flake8>=6.0.0; extra == "dev"
+Requires-Dist: mypy>=1.5.0; extra == "dev"
+Requires-Dist: jupyter>=1.0.0; extra == "dev"
+Requires-Dist: ipykernel>=6.25.0; extra == "dev"
+Provides-Extra: security
+Requires-Dist: bandit>=1.7.0; extra == "security"
+Requires-Dist: safety>=2.3.0; extra == "security"
+Provides-Extra: kubeflow
+Requires-Dist: kfp>=2.13.0; extra == "kubeflow"
+Requires-Dist: kubernetes>=28.0.0; extra == "kubeflow"
+
 # 🌍 Weather MLOps Pipeline - Global Multi-City Edition
 
 A comprehensive weather data collection, analysis, and prediction pipeline for **multiple cities worldwide** (20 countries × 2 cities each).
@@ -197,57 +257,3 @@ For issues and questions:
 ---
 
 **🌍 Happy Global Weather Forecasting!** 🌍
-
-## Pipeline Usage
-
-### Health Check Pipeline
-
-```
-python run_pipeline.py
-```
-
-### For Kubernetes (Kubeflow)
-
-```
-python run_kubeflow_pipeline.py
-```
-
-### Run Full Pipeline
-
-```
-python -m weather_mlops_pipeline run all
-# or
-python run_pipeline.py
-```
-
-### Run a Specific Stage
-
-```
-python -m weather_mlops_pipeline run fetch
-python -m weather_mlops_pipeline run clean
-python -m weather_mlops_pipeline run features
-python -m weather_mlops_pipeline run train
-python -m weather_mlops_pipeline run evaluate
-```
-
-### CLI Shortcuts
-
-```
-weather-mlops-pipeline fetch
-weather-mlops-pipeline clean
-weather-mlops-pipeline features
-weather-mlops-pipeline train
-weather-mlops-pipeline evaluate
-weather-mlops-pipeline run all
-weather-mlops-pipeline run fetch clean train
-weather-mlops-pipeline status
-weather-mlops-pipeline version
-weather-mlops-pipeline stages
-weather-mlops-pipeline show-data --head 5   # Show first 5 rows
-weather-mlops-pipeline show-data --tail 5   # Show last 5 rows
-weather-mlops-pipeline db info
-weather-mlops-pipeline db cleanup --days 7  # Clean up data older than 7 days
-weather-mlops-pipeline export --file filename.csv  # Export data to CSV
-```
-
-> **Note:** The UI commands (`./start.sh ui`, etc.) have been removed as the UI is no longer part of the project.

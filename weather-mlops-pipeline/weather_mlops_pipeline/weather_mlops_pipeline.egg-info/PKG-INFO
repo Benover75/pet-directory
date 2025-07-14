@@ -1,3 +1,55 @@
+Metadata-Version: 2.4
+Name: weather-mlops-pipeline
+Version: 2.0.0
+Summary: Professional Weather MLOps Pipeline for Cranston, RI
+Author-email: Weather MLOps Team <team@weather-mlops.com>
+License: MIT
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi>=0.104.1
+Requires-Dist: uvicorn[standard]>=0.24.0
+Requires-Dist: pandas>=2.1.3
+Requires-Dist: scikit-learn>=1.3.2
+Requires-Dist: numpy>=1.24.3
+Requires-Dist: requests>=2.31.0
+Requires-Dist: PyYAML>=6.0.1
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: sqlalchemy>=2.0.23
+Requires-Dist: alembic>=1.12.1
+Requires-Dist: prometheus-client>=0.19.0
+Requires-Dist: structlog>=23.2.0
+Requires-Dist: mlflow>=2.8.1
+Requires-Dist: dvc>=3.30.1
+Requires-Dist: pydantic>=2.5.0
+Requires-Dist: pydantic-settings>=2.1.0
+Requires-Dist: click>=8.1.7
+Requires-Dist: rich>=13.7.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.3; extra == "dev"
+Requires-Dist: pytest-cov>=4.1.0; extra == "dev"
+Requires-Dist: black>=23.11.0; extra == "dev"
+Requires-Dist: flake8>=6.1.0; extra == "dev"
+Requires-Dist: mypy>=1.7.1; extra == "dev"
+Requires-Dist: pre-commit>=3.5.0; extra == "dev"
+Requires-Dist: mkdocs>=1.5.3; extra == "dev"
+Requires-Dist: mkdocs-material>=9.4.8; extra == "dev"
+Provides-Extra: security
+Requires-Dist: python-multipart>=0.0.6; extra == "security"
+Requires-Dist: passlib[bcrypt]>=1.7.4; extra == "security"
+Requires-Dist: python-jose[cryptography]>=3.3.0; extra == "security"
+Provides-Extra: production
+Requires-Dist: gunicorn>=21.2.0; extra == "production"
+Requires-Dist: docker>=6.1.3; extra == "production"
+Requires-Dist: kubernetes>=28.1.0; extra == "production"
+
 # 🌍 Weather MLOps Pipeline - Global Multi-City Edition
 
 A comprehensive weather data collection, analysis, and prediction pipeline for **multiple cities worldwide** (20 countries × 2 cities each).
@@ -197,57 +249,3 @@ For issues and questions:
 ---
 
 **🌍 Happy Global Weather Forecasting!** 🌍
-
-## Pipeline Usage
-
-### Health Check Pipeline
-
-```
-python run_pipeline.py
-```
-
-### For Kubernetes (Kubeflow)
-
-```
-python run_kubeflow_pipeline.py
-```
-
-### Run Full Pipeline
-
-```
-python -m weather_mlops_pipeline run all
-# or
-python run_pipeline.py
-```
-
-### Run a Specific Stage
-
-```
-python -m weather_mlops_pipeline run fetch
-python -m weather_mlops_pipeline run clean
-python -m weather_mlops_pipeline run features
-python -m weather_mlops_pipeline run train
-python -m weather_mlops_pipeline run evaluate
-```
-
-### CLI Shortcuts
-
-```
-weather-mlops-pipeline fetch
-weather-mlops-pipeline clean
-weather-mlops-pipeline features
-weather-mlops-pipeline train
-weather-mlops-pipeline evaluate
-weather-mlops-pipeline run all
-weather-mlops-pipeline run fetch clean train
-weather-mlops-pipeline status
-weather-mlops-pipeline version
-weather-mlops-pipeline stages
-weather-mlops-pipeline show-data --head 5   # Show first 5 rows
-weather-mlops-pipeline show-data --tail 5   # Show last 5 rows
-weather-mlops-pipeline db info
-weather-mlops-pipeline db cleanup --days 7  # Clean up data older than 7 days
-weather-mlops-pipeline export --file filename.csv  # Export data to CSV
-```
-
-> **Note:** The UI commands (`./start.sh ui`, etc.) have been removed as the UI is no longer part of the project.

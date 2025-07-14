@@ -1,0 +1,285 @@
+# PIPELINE DEFINITION
+# Name: weather-ml-pipeline
+# Description: A comprehensive Kubeflow pipeline for weather data collection, preprocessing, and ML model training
+components:
+  comp-clean-weather-component:
+    executorLabel: exec-clean-weather-component
+    inputDefinitions:
+      parameters:
+        fetch_task:
+          parameterType: STRING
+    outputDefinitions:
+      parameters:
+        Output:
+          parameterType: STRING
+  comp-evaluate-model-component:
+    executorLabel: exec-evaluate-model-component
+    inputDefinitions:
+      parameters:
+        train_task:
+          parameterType: STRING
+    outputDefinitions:
+      parameters:
+        Output:
+          parameterType: STRING
+  comp-feature-engineering-component:
+    executorLabel: exec-feature-engineering-component
+    inputDefinitions:
+      parameters:
+        clean_task:
+          parameterType: STRING
+    outputDefinitions:
+      parameters:
+        Output:
+          parameterType: STRING
+  comp-fetch-weather-component:
+    executorLabel: exec-fetch-weather-component
+    outputDefinitions:
+      parameters:
+        Output:
+          parameterType: STRING
+  comp-train-model-component:
+    executorLabel: exec-train-model-component
+    inputDefinitions:
+      parameters:
+        features_task:
+          parameterType: STRING
+    outputDefinitions:
+      parameters:
+        Output:
+          parameterType: STRING
+deploymentSpec:
+  executors:
+    exec-clean-weather-component:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - clean_weather_component
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.13.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'pandas' 'numpy'\
+          \ 'pyyaml' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef clean_weather_component(fetch_task: str) -> str:\n    import\
+          \ sys, os\n    sys.path.append(\"/app\")\n    from weather_mlops_pipeline.preprocess.clean_weather\
+          \ import clean_weather\n    clean_weather()\n    return \"clean_completed\"\
+          \n\n"
+        image: python:3.11-slim
+    exec-evaluate-model-component:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - evaluate_model_component
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.13.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'pandas' 'numpy'\
+          \ 'scikit-learn' 'matplotlib' 'seaborn' 'pyyaml' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef evaluate_model_component(train_task: str) -> str:\n    import\
+          \ sys, os\n    sys.path.append(\"/app\")\n    from weather_mlops_pipeline.train.evaluate\
+          \ import evaluate\n    evaluate()\n    return \"evaluate_completed\"\n\n"
+        image: python:3.11-slim
+    exec-feature-engineering-component:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - feature_engineering_component
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.13.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'pandas' 'numpy'\
+          \ 'scikit-learn' 'pyyaml' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef feature_engineering_component(clean_task: str) -> str:\n    import\
+          \ sys, os\n    sys.path.append(\"/app\")\n    from weather_mlops_pipeline.preprocess.feature_engineering\
+          \ import add_features\n    add_features()\n    return \"features_completed\"\
+          \n\n"
+        image: python:3.11-slim
+    exec-fetch-weather-component:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - fetch_weather_component
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.13.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'pandas' 'pyyaml'\
+          \ 'requests' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef fetch_weather_component() -> str:\n    import sys, os\n    sys.path.append(\"\
+          /app\")\n    from weather_mlops_pipeline.ingest.fetch_weather import fetch_weather\n\
+          \    fetch_weather()\n    return \"fetch_completed\"\n\n"
+        image: python:3.11-slim
+    exec-train-model-component:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - train_model_component
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.13.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'pandas' 'numpy'\
+          \ 'scikit-learn' 'joblib' 'pyyaml' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef train_model_component(features_task: str) -> str:\n    import\
+          \ sys, os\n    sys.path.append(\"/app\")\n    from weather_mlops_pipeline.train.train_model\
+          \ import train\n    train()\n    return \"train_completed\"\n\n"
+        image: python:3.11-slim
+pipelineInfo:
+  description: A comprehensive Kubeflow pipeline for weather data collection, preprocessing,
+    and ML model training
+  name: weather-ml-pipeline
+root:
+  dag:
+    tasks:
+      clean-weather-component:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-clean-weather-component
+        dependentTasks:
+        - fetch-weather-component
+        inputs:
+          parameters:
+            fetch_task:
+              taskOutputParameter:
+                outputParameterKey: Output
+                producerTask: fetch-weather-component
+        taskInfo:
+          name: clean-weather-component
+      evaluate-model-component:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-evaluate-model-component
+        dependentTasks:
+        - train-model-component
+        inputs:
+          parameters:
+            train_task:
+              taskOutputParameter:
+                outputParameterKey: Output
+                producerTask: train-model-component
+        taskInfo:
+          name: evaluate-model-component
+      feature-engineering-component:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-feature-engineering-component
+        dependentTasks:
+        - clean-weather-component
+        inputs:
+          parameters:
+            clean_task:
+              taskOutputParameter:
+                outputParameterKey: Output
+                producerTask: clean-weather-component
+        taskInfo:
+          name: feature-engineering-component
+      fetch-weather-component:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-fetch-weather-component
+        taskInfo:
+          name: fetch-weather-component
+      train-model-component:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-train-model-component
+        dependentTasks:
+        - feature-engineering-component
+        inputs:
+          parameters:
+            features_task:
+              taskOutputParameter:
+                outputParameterKey: Output
+                producerTask: feature-engineering-component
+        taskInfo:
+          name: train-model-component
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.13.0

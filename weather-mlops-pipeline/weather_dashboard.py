@@ -17,7 +17,7 @@ def load_config():
 def load_weather_data():
     """Load and process weather data from database"""
     try:
-        from src.utils.database import get_weather_history, get_database_info
+        from weather_mlops_pipeline.utils.database import get_weather_history, get_database_info
         
         # Check if database exists and has data
         db_info = get_database_info()

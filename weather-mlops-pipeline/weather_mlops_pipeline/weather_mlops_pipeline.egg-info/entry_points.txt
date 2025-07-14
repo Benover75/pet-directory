@@ -1,0 +1,2 @@
+[console_scripts]
+weather-mlops-pipeline = src.__main__:main

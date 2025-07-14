@@ -1,0 +1,13 @@
+README.md
+pyproject.toml
+test/test_ingest.py
+test/test_model.py
+test/test_preprocess.py
+weather_mlops_pipeline/__init__.py
+weather_mlops_pipeline/__main__.py
+weather_mlops_pipeline.egg-info/PKG-INFO
+weather_mlops_pipeline.egg-info/SOURCES.txt
+weather_mlops_pipeline.egg-info/dependency_links.txt
+weather_mlops_pipeline.egg-info/entry_points.txt
+weather_mlops_pipeline.egg-info/requires.txt
+weather_mlops_pipeline.egg-info/top_level.txt

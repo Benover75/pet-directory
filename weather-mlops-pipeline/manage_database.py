@@ -6,7 +6,7 @@ Manage SQLite database operations for weather data
 
 import argparse
 import sys
-from src.utils.database import (
+from weather_mlops_pipeline.utils.database import (
     init_database, get_database_info, get_weather_statistics,
     get_weather_history, export_to_csv, clear_old_data,
     get_latest_weather
