@@ -1,3 +1,0 @@
-# Ignore config files with secrets
-config/config.yaml
-.env 
