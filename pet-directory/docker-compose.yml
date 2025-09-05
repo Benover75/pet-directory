@@ -1,0 +1,102 @@
+version: "3.9"
+
+networks:
+  backend:
+    driver: bridge
+
+services:
+  db:
+    image: postgres:17
+    container_name: pet-db
+    restart: always
+    environment:
+      POSTGRES_DB_FILE: /run/secrets/db_name
+      POSTGRES_USER_FILE: /run/secrets/db_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_pass
+    secrets:
+      - db_name
+      - db_user
+      - db_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $(cat /run/secrets/db_user) -d $(cat /run/secrets/db_name)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7
+    container_name: pet-redis
+    restart: always
+    command: ["redis-server", "--appendonly", "yes", "--save", "60", "1000"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  app:
+    build: .
+    container_name: pet-app
+    restart: always
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    secrets:
+      - db_name
+      - db_user
+      - db_pass
+      - jwt_secret
+    networks:
+      - backend
+
+  backup:
+    image: alpine:latest
+    container_name: pet-backup
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data:ro
+      - redisdata:/data:ro
+      - backups:/backups
+      - ./secrets:/run/secrets:ro
+      - ./backup.sh:/backup.sh:ro
+    entrypoint: /backup.sh
+    networks:
+      - backend
+    depends_on:
+      - db
+      - redis
+
+secrets:
+  db_name:
+    file: secrets/db_name.txt
+  db_user:
+    file: secrets/db_user.txt
+  db_pass:
+    file: secrets/db_pass.txt
+  jwt_secret:
+    file: secrets/jwt_secret.txt
+
+volumes:
+  pgdata: {}
+  redisdata: {}
+  backups: {}

@@ -1,0 +1,111 @@
+
+diff --git a/docs/AI_AGENT_DEVOPS_PLAYBOOK.md b/docs/AI_AGENT_DEVOPS_PLAYBOOK.md
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/docs/AI_AGENT_DEVOPS_PLAYBOOK.md
+@@
++# 🤖 Pet Directory AI Agent DevOps Playbook
++(Playbook content goes here — synced from scaffold)
++
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+new file mode 100644
+index 0000000..2222222
+--- /dev/null
++++ b/.github/workflows/ci.yml
+@@
++name: ci
++on: [push, pull_request]
++jobs:
++  build-test:
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - uses: actions/setup-node@v4
++        with: { node-version: 20 }
++      - run: npm ci
++      - run: npm run lint
++      - run: npm test -- --coverage
++      - name: Upload coverage
++        uses: actions/upload-artifact@v4
++        with: { name: coverage, path: coverage }
++      - name: Contract tests (OpenAPI)
++        run: npm run test:contract
++      - name: E2E (headless)
++        run: npm run test:e2e -- --reporter=junit
++      - name: Load Test (smoke)
++        run: npm run test:load:ci
++
++  release:
++    needs: build-test
++    if: github.ref == 'refs/heads/main' && needs.build-test.result == 'success'
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - run: npm ci
++      - name: Build & push image
++        run: |
++          docker build -t registry/pet-dir-api:${{ github.sha }} .
++          docker push registry/pet-dir-api:${{ github.sha }}
++      - name: Tag & release
++        run: ./scripts/release.sh
++
+diff --git a/load-tests/basic.yml b/load-tests/basic.yml
+new file mode 100644
+index 0000000..3333333
+--- /dev/null
++++ b/load-tests/basic.yml
+@@
++config:
++  target: "http://localhost:5000"
++  phases:
++    - duration: 300
++      arrivalRate: 100
++    - duration: 600
++      arrivalRate: 250
++scenarios:
++  - name: Hot path: list businesses
++    flow:
++      - get:
++          url: "/api/v1/businesses"
++  - name: Submit review (auth)
++    flow:
++      - post:
++          url: "/api/v1/auth/login"
++          json: { email: "{{ email }}", password: "{{ password }}" }
++      - post:
++          url: "/api/v1/reviews"
++          json: { businessId: "{{ id }}", rating: 5, comment: "Great!" }
++
+diff --git a/load-tests/smoke.yml b/load-tests/smoke.yml
+new file mode 100644
+index 0000000..4444444
+--- /dev/null
++++ b/load-tests/smoke.yml
+@@
++config:
++  target: "http://localhost:5000"
++  phases:
++    - duration: 60
++      arrivalRate: 25
++scenarios:
++  - name: Smoke test businesses
++    flow:
++      - get:
++          url: "/api/v1/businesses"
++
+diff --git a/package.json b/package.json
+--- a/package.json
++++ b/package.json
+@@
+   "scripts": {
+-    "test": "jest"
++    "test": "jest --runInBand",
++    "test:unit": "jest --coverage --testPathPattern=unit",
++    "test:integration": "jest --coverage --testPathPattern=integration",
++    "test:e2e": "jest --coverage --testPathPattern=e2e",
++    "test:load": "artillery run load-tests/basic.yml",
++    "test:load:ci": "artillery run --output ./reports/load-report.json load-tests/smoke.yml",
++    "test:contract": "openapi-diff --fail-on-changed ./openapi.json http://localhost:5000/api/v1/openapi.json"
+   }
+ }

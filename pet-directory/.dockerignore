@@ -1,0 +1,25 @@
+# Node.js
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Logs
+logs
+*.log
+
+# Env files
+.env
+*.env
+
+# Docker files
+Dockerfile*
+docker-compose*
+
+# Git
+.git
+.gitignore
+
+# Misc
+.vscode
+.idea
+.DS_Store

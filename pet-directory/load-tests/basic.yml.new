@@ -1,0 +1,27 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    - duration: 300
+      arrivalRate: 100
+    - duration: 600
+      arrivalRate: 250
+
+scenarios:
+  - name: Hot path: list businesses
+    flow:
+      - get:
+          url: "/api/v1/businesses"
+
+  - name: Submit review (auth)
+    flow:
+      - post:
+          url: "/api/v1/auth/login"
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+      - post:
+          url: "/api/v1/reviews"
+          json:
+            businessId: "{{ id }}"
+            rating: 5
+            comment: "Great!"

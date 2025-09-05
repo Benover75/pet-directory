@@ -1,0 +1,35 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test -- --coverage
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with: { name: coverage, path: coverage }
+      - name: Contract tests (OpenAPI)
+        run: npm run test:contract
+      - name: E2E (headless)
+        run: npm run test:e2e -- --reporter=junit
+      - name: Load Test (smoke)
+        run: npm run test:load:ci
+
+  release:
+    needs: build-test
+    if: github.ref == 'refs/heads/main' && needs.build-test.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - name: Build & push image
+        run: |
+          docker build -t registry/pet-dir-api:${{ github.sha }} .
+          docker push registry/pet-dir-api:${{ github.sha }}
+      - name: Tag & release
+        run: ./scripts/release.sh
